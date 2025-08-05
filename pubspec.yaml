@@ -1,6 +1,6 @@
 name: flugx_cli
 description: Flugx is a CLI tool that automatically generates a complete Flutter package called `app_api` using GetX, based on a Swagger/OpenAPI specification file.
-version: 1.0.0+2
+version: 1.0.0+3
 homepage: https://github.com/KalybosPro/flux
 repository: https://github.com/KalybosPro/flux
 issue_tracker: https://github.com/KalybosPro/flux/issues
@@ -28,12 +28,3 @@ dev_dependencies:
 
 executables:
   flugx: flugx
-
-flutter:
-  platform:
-    Android:
-    iOS:
-    Windows:
-    Linux:
-    macOS:
-    Web:

@@ -9,3 +9,7 @@
 ## 1.0.0+2
 
 - Issue fixed
+
+## 1.0.0+3
+
+- Platform key removed
