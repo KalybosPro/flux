@@ -175,6 +175,10 @@ export 'src/data/controllers/controllers.dart';
 
 // Bindings
 export 'src/data/bindings/app_bindings.dart';
+
+// GetX
+export 'package:get/get.dart';
+
 ''';
 
     await File('$outputDir/lib/app_api.dart').writeAsString(exportContent);

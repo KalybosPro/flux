@@ -69,7 +69,6 @@ dependencies:
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:app_api/app_api.dart';
 
 void main() {
@@ -91,7 +90,6 @@ class MyApp extends StatelessWidget {
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:app_api/app_api.dart';
 
 class MyHomePage extends StatelessWidget {
