@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 import 'package:yaml/yaml.dart';
 import 'package:universal_io/io.dart';
 
-import 'code_generators/flux_structure_generator.dart';
+import 'code_generators/flugx_structure_generator.dart';
 
 class FluxGenerator {
   Future<void> generate(String swaggerPath, String outputDir) async {

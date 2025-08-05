@@ -1,5 +1,5 @@
-name: flux
-description: Flux is a CLI tool that automatically generates a complete Flutter package called `app_api` using GetX, based on a Swagger/OpenAPI specification file.
+name: flugx_cli
+description: Flugx is a CLI tool that automatically generates a complete Flutter package called `app_api` using GetX, based on a Swagger/OpenAPI specification file.
 version: 1.0.0
 homepage: https://github.com/KalybosPro/flux
 repository: https://github.com/KalybosPro/flux
@@ -31,4 +31,4 @@ dev_dependencies:
   test: ^1.24.0
 
 executables:
-  flux: flux
+  flugx: flugx

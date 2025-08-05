@@ -1,4 +1,4 @@
-import 'package:flux/flux.dart';
+import 'package:flugx_cli/flugx.dart';
 import 'package:universal_io/io.dart';
 
 class FluxStructureGenerator {

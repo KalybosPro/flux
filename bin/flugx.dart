@@ -3,7 +3,7 @@
 
 import 'dart:io';
 import 'package:args/args.dart';
-import 'package:flux/flux.dart';
+import 'package:flugx_cli/flugx.dart';
 import 'package:path/path.dart' as p;
 
 void main(List<String> arguments) async {

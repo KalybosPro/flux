@@ -1,13 +1,13 @@
-# Flux CLI - Flutter API Package Generator
+# Flugx CLI - Flutter API Package Generator
 
-Flux is a CLI tool that automatically generates a complete Flutter package called `app_api` using GetX, based on a Swagger/OpenAPI specification file.
+Flugx is a CLI tool that automatically generates a complete Flutter package called `app_api` using GetX, based on a Swagger/OpenAPI specification file.
 
 ## Installation
 
-To install Flux globally from your local directory:
+To install Flugx globally from your local directory:
 
 ```bash
-dart pub global activate flux
+dart pub global activate flugx
 ```
 
 ## Usage
@@ -16,10 +16,10 @@ Generate the `app_api` package using a local or remote Swagger/OpenAPI file:
 
 ```bash
 # Générer depuis un fichier local
-flux --swagger swagger.json
+flugx --swagger swagger.json
 
 # Générer depuis une URL
-flux --swagger https://api.example.com/swagger.json
+flugx --swagger https://api.example.com/swagger.json
 
 ```
 
