@@ -16,8 +16,8 @@ void main(List<String> arguments) async {
     final results = parser.parse(arguments);
 
     if (results['help'] as bool || results['swagger'] == null) {
-      print('Flux CLI - Flutter API Package Generator');
-      print('Usage: flux --swagger <path_or_url>');
+      print('Flugx CLI - Flutter API Package Generator');
+      print('Usage: flugx --swagger <path_or_url>');
       print(parser.usage);
       return;
     }
@@ -53,7 +53,7 @@ void main(List<String> arguments) async {
     final swaggerPath = results['swagger'] as String;
     final outputDir = appApiPackageDir.path;
 
-    print('Generating Flutter API package with Flux...');
+    print('Generating Flutter API package with Flugx...');
     print('Swagger: $swaggerPath');
     print('Output: $outputDir');
 
