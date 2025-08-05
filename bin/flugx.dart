@@ -1,7 +1,7 @@
 #!/usr/bin/env dart
 // ignore_for_file: depend_on_referenced_packages
 
-import 'dart:io';
+import 'package:universal_io/io.dart';
 import 'package:args/args.dart';
 import 'package:flugx_cli/flugx.dart';
 import 'package:path/path.dart' as p;
