@@ -15,10 +15,10 @@ dart pub global activate flugx_cli
 Generate the `app_api` package using a local or remote Swagger/OpenAPI file:
 
 ```bash
-# Générer depuis un fichier local
+# Generate from a local Swagger file
 flugx --swagger swagger.json
 
-# Générer depuis une URL
+# Generate from a remote Swagger URL
 flugx --swagger https://api.example.com/swagger.json
 
 ```
