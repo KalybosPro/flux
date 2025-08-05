@@ -1,4 +1,4 @@
-import 'package:flux_cli/flux.dart';
+import 'package:flux/flux.dart';
 import 'package:test/test.dart';
 import 'package:universal_io/io.dart';
 import 'package:path/path.dart' as p;

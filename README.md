@@ -7,7 +7,7 @@ Flux is a CLI tool that automatically generates a complete Flutter package calle
 To install Flux globally from your local directory:
 
 ```bash
-dart pub global activate flux_cli
+dart pub global activate flux
 ```
 
 ## Usage

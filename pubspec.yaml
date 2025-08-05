@@ -1,5 +1,5 @@
-name: flux_cli
-description: A sample command-line application.
+name: flux
+description: Flux is a CLI tool that automatically generates a complete Flutter package called `app_api` using GetX, based on a Swagger/OpenAPI specification file.
 version: 1.0.0
 homepage: https://github.com/KalybosPro/flux
 repository: https://github.com/KalybosPro/flux
