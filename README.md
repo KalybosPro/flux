@@ -80,7 +80,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      initialBinding: AppBindings(appBaseUrl: 'https://api.example.com'),
+      initialBinding: AppBindings(),
       home: MyHomePage(),
     );
   }
