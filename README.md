@@ -7,7 +7,7 @@ Flugx is a CLI tool that automatically generates a complete Flutter package call
 To install Flugx globally from your local directory:
 
 ```bash
-dart pub global activate flugx
+dart pub global activate flugx_cli
 ```
 
 ## Usage
