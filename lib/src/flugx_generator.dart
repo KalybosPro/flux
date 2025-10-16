@@ -81,21 +81,26 @@ class FluxGenerator {
     }
   }
 
-  Future<void> runProcess(String executable, List<String> arguments,
+  /// Executes a shell process with proper error handling.
+  /// Returns a [ProcessResult] containing exit code, stdout, and stderr.
+  Future<ProcessResult> runProcess(String executable, List<String> arguments,
       {required String workingDirectory}) async {
-    final proc = await Process.start(
-      executable,
-      arguments,
-      runInShell: true,
-      workingDirectory: workingDirectory,
-    );
-    await stdout.addStream(proc.stdout);
-    await stderr.addStream(proc.stderr);
-    final exitCode = await proc.exitCode;
-    if (exitCode != 0) {
-      stderr.write(proc.stderr);
-      print('Failed to create Flutter package:');
-      exit(1);
+    try {
+      final result = await Process.run(
+        executable,
+        arguments,
+        workingDirectory: workingDirectory,
+        runInShell: true,
+      );
+
+      if (result.exitCode != 0) {
+        throw ProcessException(
+            executable, arguments, result.stderr.toString(), result.exitCode);
+      }
+
+      return result;
+    } catch (e) {
+      rethrow;
     }
   }
 

@@ -1,14 +1,20 @@
 import 'package:flugx_cli/flugx.dart';
 import 'package:universal_io/io.dart';
 
+/// A functional code generator for creating Flutter GetX structures from OpenAPI specs.
+/// Generates models, APIs, repositories, controllers, and bindings in a maintainable way.
 class FluxStructureGenerator {
   final String outputDir;
-  final List<String> models = [];
-  final List<String> apis = [];
-  final List<String> repos = [];
-  final List<String> controllers = [];
+  final List<String> models;
+  final List<String> apis;
+  final List<String> repos;
+  final List<String> controllers;
 
-  FluxStructureGenerator(this.outputDir);
+  FluxStructureGenerator(this.outputDir)
+      : models = [],
+        apis = [],
+        repos = [],
+        controllers = [];
 
   Future<void> generateAll(Map<String, dynamic> swaggerDoc) async {
     // Generate models from components/schemas
@@ -43,6 +49,9 @@ class FluxStructureGenerator {
     final properties = schema['properties'] as Map<String, dynamic>? ?? {};
     final required = (schema['required'] as List?)?.cast<String>() ?? [];
 
+    final modelProps = generateModelProperties(properties, required);
+    final constructorParams = generateConstructorParameters(properties, required);
+
     final buffer = StringBuffer();
 
     buffer.writeln(kServiceHeader);
@@ -56,24 +65,14 @@ class FluxStructureGenerator {
     buffer.writeln('class ${modelName.pascalCase} {');
 
     // Properties
-    for (final prop in properties.entries) {
-      final propName = prop.key.camelCase;
-      final propType = _getDartType(prop.value);
-      final isRequired = required.contains(prop.key);
-
-      if (!isRequired) {
-        buffer.writeln('  @JsonKey(includeIfNull: false)');
-      }
-      buffer.writeln('  final $propType${!isRequired ? '?' : ''} $propName;');
-      buffer.writeln();
+    for (final prop in modelProps) {
+      buffer.writeln(prop);
     }
 
     // Constructor
     buffer.writeln('  const ${modelName.pascalCase}({');
-    for (final prop in properties.entries) {
-      final propName = prop.key.camelCase;
-      final isRequired = required.contains(prop.key);
-      buffer.writeln('    ${isRequired ? 'required ' : ''}this.$propName,');
+    for (final param in constructorParams) {
+      buffer.writeln(param);
     }
     buffer.writeln('  });');
     buffer.writeln();
@@ -92,7 +91,34 @@ class FluxStructureGenerator {
         .writeAsString(buffer.toString());
   }
 
-  String _getDartType(Map<String, dynamic> property) {
+  /// Generates Dart properties from OpenAPI schema.
+  static List<String> generateModelProperties(
+      Map<String, dynamic> properties, List<String> required) {
+    return properties.entries.map((prop) {
+      final propName = prop.key.camelCase;
+      final propType = getDartType(prop.value);
+      final isRequired = required.contains(prop.key);
+      final nullableModifier = isRequired ? '' : '?';
+      final jsonKeyAnnotation = isRequired
+          ? ''
+          : '  @JsonKey(includeIfNull: false)\n';
+
+      return '${jsonKeyAnnotation}  final $propType$nullableModifier $propName;';
+    }).toList();
+  }
+
+  /// Generates constructor parameters from OpenAPI schema.
+  static List<String> generateConstructorParameters(
+      Map<String, dynamic> properties, List<String> required) {
+    return properties.entries.map((prop) {
+      final propName = prop.key.camelCase;
+      final isRequired = required.contains(prop.key);
+      return '    ${isRequired ? 'required ' : ''}this.$propName,';
+    }).toList();
+  }
+
+  /// Maps OpenAPI property types to Dart type strings.
+  static String getDartType(Map<String, dynamic> property) {
     final type = property['type'] as String?;
     final format = property['format'] as String?;
 
@@ -109,7 +135,7 @@ class FluxStructureGenerator {
       case 'array':
         final items = property['items'] as Map<String, dynamic>?;
         if (items != null) {
-          final itemType = _getDartType(items);
+          final itemType = getDartType(items);
           return 'List<$itemType>';
         }
         return 'List<dynamic>';
@@ -125,10 +151,26 @@ class FluxStructureGenerator {
     }
   }
 
+  /// Groups endpoints by service names and generates API, repository, and controller services.
   Future<void> _generateServices(Map<String, dynamic> paths) async {
+    final serviceGroups = _groupEndpointsByService(paths);
+
+    for (final group in serviceGroups.entries) {
+      final serviceName = group.key.pascalCase;
+      await _generateApiService(serviceName, group.value);
+      await _generateRepository(serviceName, group.value);
+      await _generateController(serviceName, group.value);
+
+      apis.add(serviceName);
+      repos.add(serviceName);
+      controllers.add(serviceName);
+    }
+  }
+
+  /// Groups endpoints from paths by service names based on tags or path segments.
+  Map<String, List<Map<String, dynamic>>> _groupEndpointsByService(Map<String, dynamic> paths) {
     final serviceGroups = <String, List<Map<String, dynamic>>>{};
 
-    // Group endpoints by tags or path segments
     for (final pathEntry in paths.entries) {
       final pathName = pathEntry.key;
       final pathMethods = pathEntry.value as Map<String, dynamic>;
@@ -149,17 +191,7 @@ class FluxStructureGenerator {
       }
     }
 
-    // Generate services for each group
-    for (final group in serviceGroups.entries) {
-      final serviceName = group.key.pascalCase;
-      await _generateApiService(serviceName, group.value);
-      await _generateRepository(serviceName, group.value);
-      await _generateController(serviceName, group.value);
-
-      apis.add(serviceName);
-      repos.add(serviceName);
-      controllers.add(serviceName);
-    }
+    return serviceGroups;
   }
 
   String _extractServiceFromPath(String path) {
@@ -251,14 +283,15 @@ class FluxStructureGenerator {
         .writeAsString(buffer.toString());
   }
 
-  String? getOperationName(Map<String, dynamic> operation) {
+  /// Extracts operation name from OpenAPI operation, preferring operationId or deriving from summary.
+  static String? getOperationName(Map<String, dynamic> operation) {
     String operationId = operation['operationId']?.toString() ?? '';
     String summary = operation['summary']?.toString() ?? '';
 
     operationId = removeDiacritics(operationId);
     summary = removeDiacritics(summary);
 
-    // Vérifie si operationId ressemble à un hash (32 caractères hexadécimaux)
+    // Check if operationId looks like a hash (32 hexadecimal characters)
     final isHash = RegExp(r'^[a-f0-9]{32}$').hasMatch(operationId);
 
     if ((operationId.isEmpty || isHash) && summary.isNotEmpty) {
@@ -272,20 +305,6 @@ class FluxStructureGenerator {
 
     return operationId;
   }
-
-  // Future<void> generateTests(
-  //   String packageRoot,
-  // ) async {
-  //   final testDir = Directory(p.join(packageRoot, 'test'));
-  //   await ensureDirExists(testDir);
-  //   final filePath = '${testDir.path}/app_api_test.dart';
-
-  //   final buffer = StringBuffer();
-
-  //   buffer.writeln(kServiceHeader);
-  //   buffer.writeln();
-  //   buffer.writeln("import 'package:flutter_test/flutter_test.dart';");
-  // }
 
   Future<void> _generateRepository(
       String serviceName, List<Map<String, dynamic>> endpoints) async {
@@ -512,38 +531,39 @@ class FluxStructureGenerator {
         .writeAsString(buffer.toString());
   }
 
+  /// Generates export files for models, APIs, repos, and controllers.
   Future<void> _generateExportFiles() async {
-    // Models export
-    final modelsBuffer = StringBuffer();
-    for (final model in models) {
-      modelsBuffer.writeln("export '${model.toLowerCase()}.dart';");
+    // Helper function to generate export content
+    String generateExports(List<String> items, String suffix) {
+      final buffer = StringBuffer();
+      for (final item in items) {
+        buffer.writeln("export '${item.toLowerCase()}$suffix");
+      }
+      return buffer.toString();
     }
-    await File('$outputDir/lib/src/models/models.dart')
-        .writeAsString(modelsBuffer.toString());
 
-    // APIs export
-    final apisBuffer = StringBuffer();
-    for (final api in apis) {
-      apisBuffer.writeln("export '${api.toLowerCase()}_api.dart';");
+    // Generate model exports
+    if (models.isNotEmpty) {
+      await File('$outputDir/lib/src/models/models.dart')
+          .writeAsString(generateExports(models, '.dart'));
     }
-    await File('$outputDir/lib/src/data/apis/apis.dart')
-        .writeAsString(apisBuffer.toString());
 
-    // Repos export
-    final reposBuffer = StringBuffer();
-    for (final repo in repos) {
-      reposBuffer.writeln("export '${repo.toLowerCase()}_repo.dart';");
+    // Generate API exports
+    if (apis.isNotEmpty) {
+      await File('$outputDir/lib/src/data/apis/apis.dart')
+          .writeAsString(generateExports(apis, '_api.dart'));
     }
-    await File('$outputDir/lib/src/data/repos/repos.dart')
-        .writeAsString(reposBuffer.toString());
 
-    // Controllers export
-    final controllersBuffer = StringBuffer();
-    for (final controller in controllers) {
-      controllersBuffer
-          .writeln("export '${controller.toLowerCase()}_controller.dart';");
+    // Generate repository exports
+    if (repos.isNotEmpty) {
+      await File('$outputDir/lib/src/data/repos/repos.dart')
+          .writeAsString(generateExports(repos, '_repo.dart'));
     }
-    await File('$outputDir/lib/src/data/controllers/controllers.dart')
-        .writeAsString(controllersBuffer.toString());
+
+    // Generate controller exports
+    if (controllers.isNotEmpty) {
+      await File('$outputDir/lib/src/data/controllers/controllers.dart')
+          .writeAsString(generateExports(controllers, '_controller.dart'));
+    }
   }
 }

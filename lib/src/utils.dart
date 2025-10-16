@@ -1,11 +1,14 @@
 import 'package:universal_io/io.dart';
 
+/// Ensures that a directory exists, creating it recursively if necessary.
 Future<void> ensureDirExists(Directory dir) async {
   if (!await dir.exists()) {
     await dir.create(recursive: true);
   }
 }
 
+/// Removes diacritics (accents) from a string, converting them to their base characters.
+/// Useful for generating clean identifiers from potentially accented text.
 String removeDiacritics(String input) {
   const accents = {
     'à': 'a',
@@ -49,11 +52,14 @@ String removeDiacritics(String input) {
   return input.split('').map((char) => accents[char] ?? char).join();
 }
 
+/// Capitalizes the first letter of a string, leaving the rest unchanged.
 String capitalize(String word) {
   if (word.isEmpty) return '';
   return word[0].toUpperCase() + word.substring(1);
 }
 
+/// Extracts path parameters from a URL path string.
+/// Parameters are identified by curly braces, e.g., "/users/{id}" would return ["id"].
 List<String> extractPathParameters(String path) {
   final regex = RegExp(r'\{([^}]+)\}');
   return regex.allMatches(path).map((m) => m.group(1)!).toList();
