@@ -103,7 +103,7 @@ class FluxStructureGenerator {
           ? ''
           : '  @JsonKey(includeIfNull: false)\n';
 
-      return '${jsonKeyAnnotation}  final $propType$nullableModifier $propName;';
+      return '$jsonKeyAnnotation  final $propType$nullableModifier $propName;';
     }).toList();
   }
 

@@ -162,9 +162,4 @@ class RecipesController extends GetxController {
     }
   }
 
-  @override
-  void onInit() {
-    super.onInit();
-    // Initialize controller if needed
-  }
 }

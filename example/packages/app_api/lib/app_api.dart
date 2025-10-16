@@ -1,4 +1,4 @@
-library app_api;
+library;
 
 // Models
 export 'src/models/models.dart';

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:app_api/src/data/repos/users_repo.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -83,14 +84,20 @@ class UsersController extends GetxController {
       final jsonData = json.decode(jsonString);
 
       if (jsonData is Map<String, dynamic>) {
-        print('OpenAPI Title: ${jsonData['info']['title']}');
-        print('Nombre de routes: ${jsonData['paths'].keys.length}');
+        if (kDebugMode) {
+          print('OpenAPI Title: ${jsonData['info']['title']}');
+        }
+        if (kDebugMode) {
+          print('Nombre de routes: ${jsonData['paths'].keys.length}');
+        }
         // return jsonData;
       } else {
         throw Exception('Le fichier JSON n’est pas valide');
       }
     } catch (e) {
-      print('Error: $e');
+      if (kDebugMode) {
+        print('Error: $e');
+      }
     }
   }
 }
